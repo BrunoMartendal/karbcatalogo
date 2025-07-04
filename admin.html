@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Catálogo de Produtos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <header class="bg-blue-600 text-white p-4 text-center">
+        <h1 class="text-3xl font-bold">Admin - Catálogo</h1>
+    </header>
+    <main class="container mx-auto p-4">
+        <!-- Área de Login -->
+        <div id="adminLogin" class="mb-4">
+            <h2 class="text-2xl font-semibold mb-2">Login Administrativo</h2>
+            <input type="text" id="username" placeholder="Usuário" class="border p-2 rounded mb-2 w-full">
+            <input type="password" id="password" placeholder="Senha" class="border p-2 rounded mb-2 w-full">
+            <button id="loginBtn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Entrar</button>
+        </div>
+        <!-- Formulário de Cadastro -->
+        <div id="adminForm" class="hidden mb-4">
+            <h2 class="text-2xl font-semibold mb-2">Cadastrar Novo Produto</h2>
+            <input type="text" id="productName" placeholder="Nome do Produto" class="border p-2 rounded mb-2 w-full">
+            <input type="text" id="productDesc" placeholder="Descrição" class="border p-2 rounded mb-2 w-full">
+            <input type="number" id="productPrice" placeholder="Preço (R$)" step="0.01" class="border p-2 rounded mb-2 w-full">
+            <button id="addProductBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Adicionar Produto</button>
+        </div>
+        <!-- Catálogo Gerenciável -->
+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+    </main>
+    <script>
+        let products = [
+            { id: 1, name: "Produto 1", desc: "Descrição breve do produto 1.", price: 99.90 },
+            { id: 2, name: "Produto 2", desc: "Descrição breve do produto 2.", price: 149.90 },
+            { id: 3, name: "Produto 3", desc: "Descrição breve do produto 3.", price: 199.90 }
+        ];
+
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+            products.forEach(product => {
+                const div = document.createElement('div');
+                div.className = 'bg-white rounded-lg shadow-md p-4 relative';
+                div.innerHTML = `
+                    <img src="https://via.placeholder.com/150" alt="${product.name}" class="w-full h-48 object-cover rounded-md" onerror="this.src='https://via.placeholder.com/150?text=Imagem+Não+Carregada';">
+                    <h2 class="text-xl font-semibold mt-2">${product.name}</h2>
+                    <p class="text-gray-600">${product.desc}</p>
+                    <p class="text-green-600 font-bold mt-2">R$ ${product.price.toFixed(2)}</p>
+                    <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Adicionar ao Carrinho</button>
+                    <button class="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700" onclick="deleteProduct(${product.id})">Deletar</button>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        // Login Simples
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (username === 'admin' && password === '123') {
+                document.getElementById('adminLogin').classList.add('hidden');
+                document.getElementById('adminForm').classList.remove('hidden');
+                renderProducts();
+            } else {
+                alert('Usuário ou senha incorretos!');
+            }
+        });
+
+        // Adicionar Novo Produto
+        document.getElementById('addProductBtn').addEventListener('click', () => {
+            const name = document.getElementById('productName').value;
+            const desc = document.getElementById('productDesc').value;
+            const price = document.getElementById('productPrice').value;
+
+            if (name && desc && price) {
+                const newId = products.length ? Math.max(...products.map(p => p.id)) + 1 : 1;
+                products.push({ id: newId, name, desc, price: parseFloat(price) });
+                renderProducts();
+                document.getElementById('productName').value = '';
+                document.getElementById('productDesc').value = '';
+                document.getElementById('productPrice').value = '';
+            } else {
+                alert('Preencha todos os campos!');
+            }
+        });
+
+        // Deletar Produto
+        window.deleteProduct = function(id) {
+            products = products.filter(p => p.id !== id);
+            renderProducts();
+        };
+
+        // Inicializar
+        renderProducts();
+    </script>
+</body>
+</html>
